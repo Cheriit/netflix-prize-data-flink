@@ -65,7 +65,7 @@ object ProcessingEngine extends App {
     }
 
   val mysqlSink = JdbcSinkHelper.get[MovieRatingResultWithTitle](
-    "INSERT INTO movieRatings (window_start, movie_id, title, rating_count, rating_sum, unique_rating_count) VALUES (?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE rating_count=?, rating_sum=?, unique_rating_count=?",
+    "INSERT INTO movie_ratings (window_start, movie_id, title, rating_count, rating_sum, unique_rating_count) VALUES (?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE rating_count=?, rating_sum=?, unique_rating_count=?",
     (statement, movieRating: MovieRatingResultWithTitle) => {
       statement.setDate(1, new Date(movieRating.windowStart))
       statement.setString(2, movieRating.movieId)
