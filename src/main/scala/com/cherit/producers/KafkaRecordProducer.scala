@@ -1,15 +1,15 @@
-package com.cherit.producer
+package com.cherit.producers
 
 import org.apache.kafka.clients.producer.{KafkaProducer, ProducerRecord}
 
 import java.io.File
 import java.nio.file.{Files, Paths}
-import java.util.Properties
+import java.util.{NoSuchElementException, Properties}
 import java.util.concurrent.TimeUnit
 
-object KafkaProducer extends App {
+object KafkaRecordProducer extends App {
   if (args.length != 4)
-    throw NoSuchElementException
+    throw new NoSuchElementException
 
   val directory = args(0)
   val sleepTime = args(1)
@@ -18,10 +18,10 @@ object KafkaProducer extends App {
   val properties = new Properties();
   properties.put("bootstrap.servers", args(3))
   properties.put("acks", "all")
-  properties.put("retries", 0)
-  properties.put("batch.size", 16384)
-  properties.put("linger.ms", 1)
-  properties.put("buffer.memory", 33554432)
+  properties.put("retries", "0")
+  properties.put("batch.size", "16384")
+  properties.put("linger.ms", "1")
+  properties.put("buffer.memory", "33554432")
   properties.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer")
   properties.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer")
 

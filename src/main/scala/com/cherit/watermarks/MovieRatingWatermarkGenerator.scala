@@ -1,4 +1,4 @@
-package com.cherit.processing_engine
+package com.cherit.watermarks
 
 import com.cherit.Helpers
 import org.apache.flink.api.common.eventtime.{Watermark, WatermarkGenerator, WatermarkOutput}

@@ -1,3 +1,6 @@
-kafka-topics.sh --zookeeper localhost:21812 --create --replication0-factor 1 --partitions 1 --topic netflix-ratings
-CLUSTER_NAME=$(/usr/share/google/get_metadata_value attributes/dataproc-cluster-name)
-java -cp /usr/lib/kafka/libs/*:KafkaProducer.jar com.cherit.producer.KafkaProducer netflix-prize-data 15 netflix-ratings ${CLUSTER_NAME}-w-0:9092
+./setup_vars.sh
+java -cp ../producers/target/scalka-2.12/KafkaRecordProducer.jar com.cherit.producer.KafkaProducer \
+  "$INPUT_DIRECTORY" \
+  "$KAFKA_PRODUCER_SLEEP_TIME" \
+  "$KAFKA_DATA_TOPIC_NAME" \
+  "$KAFKA_BOOTSTRAP_SERVERS"
