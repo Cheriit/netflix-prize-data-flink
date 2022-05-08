@@ -79,7 +79,7 @@ object ProcessingEngine {
         statement.setLong(8, movieRating.ratingSum)
         statement.setLong(9, movieRating.uniqueRatingCount)
       },
-      args(4), "com.mysql.cj.jdbc.Driver", args(5), args(6)
+      args(4), "com.mysql.jdbc.Driver", args(5), args(6)
     )
     aggregatedRatingWithTitleDS.addSink(mysqlSink)
 

@@ -9,7 +9,7 @@ object JdbcRecordConsumer extends App {
 
   var connection: Connection = _
   try {
-    Class.forName("com.mysql.cj.jdbc.Driver")
+    Class.forName("com.mysql.jdbc.Driver")
     connection = DriverManager.getConnection(args(0), args(1), args(2))
     val statement = connection.createStatement
     while(true) {
