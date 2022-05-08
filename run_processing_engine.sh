@@ -5,7 +5,6 @@ $FLINK_DIRECTORY/flink run -m yarn-cluster -p 2 -yjm 1024m -ytm 2048m -c com.che
   "$KAFKA_DATA_TOPIC_NAME" \
   "$KAFKA_GROUP_ID" \
   "$JDBC_URL" \
-  "$JDBC_DRIVER_NAME" \
   "$JDBC_USERNAME" \
   "$JDBC_PASSWORD" \
   "$ANOMALY_PERIOD_LENGTH" \

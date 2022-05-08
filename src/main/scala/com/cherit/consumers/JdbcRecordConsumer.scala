@@ -9,8 +9,8 @@ object JdbcRecordConsumer extends App {
 
   var connection: Connection = _
   try {
-    Class.forName(args(1))
-    connection = DriverManager.getConnection(args(0), args(2), args(3))
+    Class.forName("com.mysql.cj.jdbc.Driver")
+    connection = DriverManager.getConnection(args(0), args(1), args(2))
     val statement = connection.createStatement
     while(true) {
       val result = statement.executeQuery("SELECT * FROM ratings ORDER BY window_start DESC LIMIT 50")

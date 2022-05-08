@@ -15,7 +15,6 @@ export KAFKA_GROUP_ID="netflix-ratings-group"
 
 # JDBC parameters
 export JDBC_URL="jdbc:mysql://localhost:3307/$KAFKA_DATA_TOPIC_NAME"
-export JDBC_DRIVER_NAME="com.mysql.cj.jdbc.Driver"
 export JDBC_USERNAME="hive"
 export JDBC_PASSWORD="hive-password"
 

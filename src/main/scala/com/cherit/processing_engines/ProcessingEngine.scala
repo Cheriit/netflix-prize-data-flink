@@ -20,7 +20,7 @@ import org.apache.flink.streaming.api.windowing.windows.TimeWindow
 import java.sql.Date
 
 object ProcessingEngine extends App {
-  if (args.length != 13)
+  if (args.length != 12)
     throw new NoSuchElementException
 
   val senv = StreamExecutionEnvironment.getExecutionEnvironment
@@ -54,7 +54,7 @@ object ProcessingEngine extends App {
   val aggregatedRatingDS: DataStream[MovieRatingResult] = movieRatingDS
     .keyBy(_.movieId)
     .window(TumblingEventTimeWindows.of(Time.days(30)))
-    .trigger(ContinuousEventTimeTrigger.of[TimeWindow](if (args(13) == "H") Time.days(30) else Time.seconds(10)))
+    .trigger(ContinuousEventTimeTrigger.of[TimeWindow](if (args(11) == "H") Time.days(30) else Time.seconds(10)))
     .aggregate(new MovieRatingAggregator, new MovieRatingProcessFunction)
 
   val aggregatedRatingWithTitleDS: DataStream[MovieRatingResultWithTitle] = aggregatedRatingDS
@@ -78,16 +78,16 @@ object ProcessingEngine extends App {
       statement.setLong(8, movieRating.ratingSum)
       statement.setLong(9, movieRating.uniqueRatingCount)
     },
-    args(4), args(5), args(6), args(7)
+    args(4), "com.mysql.cj.jdbc.Driver", args(5), args(6)
   )
   aggregatedRatingWithTitleDS.addSink(mysqlSink)
 
   val movieAnomaliesRatingDS: DataStream[MovieRatingAnomaly] = movieRatingDS
     .keyBy(_.movieId)
-    .window(SlidingEventTimeWindows.of(Time.days(args(8).toInt), Time.days(1)))
+    .window(SlidingEventTimeWindows.of(Time.days(args(7).toInt), Time.days(1)))
     .aggregate(new MovieRatingAnomalyAggregator(), new MovieRatingAnomalyProcessFunction())
-    .filter(_.ratingCount >= args(9).toInt)
-    .filter(_.ratingMean >= args(10).toLong)
+    .filter(_.ratingCount >= args(8).toInt)
+    .filter(_.ratingMean >= args(9).toLong)
 
   val movieAnomaliesRatingWithTitleDS: DataStream[MovieRatingAnomalyWithTitle] = movieAnomaliesRatingDS
     .join(movieDS)
@@ -97,7 +97,7 @@ object ProcessingEngine extends App {
       (anomaly, movie) => MovieRatingAnomalyWithTitle(anomaly.windowStart, anomaly.windowStop, movie.title, anomaly.ratingCount, anomaly.ratingMean)
     }
 
-  val kafkaSink = KafkaSinkHelper.get(args(1), args(11))
+  val kafkaSink = KafkaSinkHelper.get(args(1), args(10))
   movieAnomaliesRatingWithTitleDS.map(_.toString).sinkTo(kafkaSink)
   senv.execute("Netflix Prize Data processing...")
 
