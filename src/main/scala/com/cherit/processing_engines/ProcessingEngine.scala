@@ -14,7 +14,8 @@ import org.apache.flink.core.fs.Path
 import org.apache.flink.streaming.api.scala.{DataStream, StreamExecutionEnvironment}
 import org.apache.flink.streaming.api.windowing.assigners.{SlidingEventTimeWindows, TumblingEventTimeWindows}
 import org.apache.flink.streaming.api.windowing.time.Time
-import org.apache.flink.streaming.api.windowing.triggers.EventTimeTrigger
+import org.apache.flink.streaming.api.windowing.triggers.{ContinuousEventTimeTrigger, EventTimeTrigger}
+import org.apache.flink.streaming.api.windowing.windows.TimeWindow
 
 import java.sql.Date
 
@@ -53,7 +54,7 @@ object ProcessingEngine extends App {
   val aggregatedRatingDS: DataStream[MovieRatingResult] = movieRatingDS
     .keyBy(_.movieId)
     .window(TumblingEventTimeWindows.of(Time.days(30)))
-//    .trigger(EventTimeTrigger.create().)
+    .trigger(ContinuousEventTimeTrigger.of[TimeWindow](if (args(13) == "H") Time.days(30) else Time.seconds(10)))
     .aggregate(new MovieRatingAggregator, new MovieRatingProcessFunction)
 
   val aggregatedRatingWithTitleDS: DataStream[MovieRatingResultWithTitle] = aggregatedRatingDS
