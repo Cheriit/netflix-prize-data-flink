@@ -10,6 +10,6 @@ unzip -j "$HOME/netflix-prize-data.zip" -d "$INPUT_DIRECTORY_PATH" || exit
 wget https://dlcdn.apache.org/flink/flink-1.14.4/flink-1.14.4-bin-scala_2.11.tgz -P "$HOME" || exit
 tar -xzf "$HOME/flink-1.14.4-bin-scala_2.11.tgz" || exit
 sbt clean assembly || exit
-kafka-topics.sh --zookeeper localhost:2181 --create --replication-factor 1 --partitions 1 --topic "$KAFKA_ANOMALY_TOPIC_NAME" || exit
-kafka-topics.sh --zookeeper localhost:2181 --create --replication-factor 1 --partitions 1 --topic "$KAFKA_DATA_TOPIC_NAME" || exit
+kafka-topics.sh --zookeeper ${CLUSTER_NAME}-m:2181 --create --replication-factor 1 --partitions 1 --topic $KAFKA_ANOMALY_TOPIC_NAME || exit
+kafka-topics.sh --zookeeper ${CLUSTER_NAME}-m:2181 --create --replication-factor 1 --partitions 1 --topic $KAFKA_DATA_TOPIC_NAME || exit
 mysql -u root -p < setup.sql
