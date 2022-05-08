@@ -1,5 +1,5 @@
 # Cloud parameters
-export BUCKET_NAME="<your bucket name>"
+export BUCKET_NAME="fsz-pbd-2022"
 export CLUSTER_NAME=$(/usr/share/google/get_metadata_value attributes/dataproc-cluster-name)
 export HADOOP_CONF_DIR=/etc/hadoop/conf
 export HADOOP_CLASSPATH=`hadoop classpath`
@@ -14,10 +14,10 @@ export KAFKA_BOOTSTRAP_SERVERS="${CLUSTER_NAME}-w-0:9092"
 export KAFKA_GROUP_ID="netflix-ratings-group"
 
 # JDBC parameters
-export JDBC_URL=""
-export JDBC_DRIVER_NAME=""
-export JDBC_USERNAME="root"
-export JDBC_PASSWORD=""
+export JDBC_URL="jdbc:mysql://$CLUSTER_NAME-m/metastore"
+export JDBC_DRIVER_NAME="com.mysql.cj.jdbc.Driver"
+export JDBC_USERNAME="hive"
+export JDBC_PASSWORD="hive-password"
 
 # Flink parameters
 export FLINK_DIRECTORY="$HOME/flink-1.14.4-bin-scala_2.11"
