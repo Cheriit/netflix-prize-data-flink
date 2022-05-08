@@ -12,20 +12,3 @@ libraryDependencies ++= Seq(
   "org.apache.flink" %% "flink-connector-kafka" % flinkVersion,
   "org.apache.flink" %% "flink-connector-jdbc" % flinkVersion,
 )
-
-lazy val processing_engine = (project in file("processing_engines"))
-  .settings(
-    assembly / mainClass := Some("com.cherit.processing_engine.ProcessingEngine"),
-    assembly / assemblyJarName := "ProcessingEngine.jar"
-  )
-
-lazy val consumers = (project in file("consumers"))
-  .settings(
-    assembly / assemblyJarName := "consumers.jar"
-  )
-
-lazy val producers = (project in file("producers"))
-  .settings(
-    assembly / mainClass := Some("com.cherit.producers.KafkaRecordProducer"),
-    assembly / assemblyJarName := "KafkaRecordProducer.jar"
-  )

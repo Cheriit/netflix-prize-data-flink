@@ -7,14 +7,14 @@ export INPUT_DIRECTORY_PATH="$HOME/netflix-prize-data"
 export INPUT_FILE_PATH="$HOME/movie_titles.csv"
 
 # Kafka parameters
-export KAFKA_PRODUCER_SLEEP_TIME=15
+export KAFKA_PRODUCER_SLEEP_TIME=30
 export KAFKA_DATA_TOPIC_NAME="netflix-ratings"
 export KAFKA_ANOMALY_TOPIC_NAME="netflix-ratings-anomalies"
 export KAFKA_BOOTSTRAP_SERVERS="${CLUSTER_NAME}-w-0:9092"
 export KAFKA_GROUP_ID="netflix-ratings-group"
 
 # JDBC parameters
-export JDBC_URL="jdbc:mysql://localhost:3306/$KAFKA_DATA_TOPIC_NAME"
+export JDBC_URL="jdbc:mysql://localhost:3307/$KAFKA_DATA_TOPIC_NAME"
 export JDBC_DRIVER_NAME="com.mysql.cj.jdbc.Driver"
 export JDBC_USERNAME="hive"
 export JDBC_PASSWORD="hive-password"

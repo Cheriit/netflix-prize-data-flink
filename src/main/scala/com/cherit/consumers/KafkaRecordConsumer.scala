@@ -14,8 +14,8 @@ object KafkaRecordConsumer extends App {
   val properties = new Properties();
   properties.put("bootstrap.servers", args(0))
   properties.put("group.id", args(1))
-  properties.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer")
-  properties.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer")
+  properties.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer")
+  properties.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer")
 
   val consumer = new KafkaConsumer[String, String](properties)
   consumer.subscribe(singletonList(args(2)))

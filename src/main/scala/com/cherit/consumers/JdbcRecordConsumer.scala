@@ -20,7 +20,7 @@ object JdbcRecordConsumer extends App {
         val movieId = result.getString("movie_id")
         val title = result.getString("title")
         val ratingCount = result.getInt("rating_count")
-        val ratingSum = result.getString("rating_sum")
+        val ratingSum = result.getInt("rating_sum")
         val uniqueRatingCount = result.getInt("unique_rating_count")
         val dateFrom = s"${windowStart.getYear}-${windowStart.getMonth}-${windowStart.getDayOfMonth}"
         windowStart.plusDays(30)

@@ -14,7 +14,6 @@ object KafkaRecordProducer extends App {
   val directory = args(0)
   val sleepTime = args(1)
   val topicName = args(2)
-
   val properties = new Properties();
   properties.put("bootstrap.servers", args(3))
   properties.put("acks", "all")
