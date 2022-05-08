@@ -4,7 +4,7 @@ import org.apache.flink.connector.jdbc.{JdbcConnectionOptions, JdbcExecutionOpti
 import org.apache.flink.streaming.api.functions.sink.SinkFunction
 
 object JdbcSinkHelper {
-  def get[T](statement: String, statementFunction: JdbcStatementBuilder[T], url: String, driverName: String, username: String, password: String): SinkFunction[T] = JdbcSink.sink(
+  def get[T](statement: String, statementFunction: JdbcStatementBuilder[T], url: String, username: String, password: String): SinkFunction[T] = JdbcSink.sink(
     statement,
     statementFunction,
     JdbcExecutionOptions
@@ -16,7 +16,7 @@ object JdbcSinkHelper {
     new JdbcConnectionOptions
     .JdbcConnectionOptionsBuilder()
       .withUrl(url)
-      .withDriverName(driverName)
+      .withDriverName("com.mysql.jdbc.Driver")
       .withUsername(username)
       .withPassword(password)
       .build()

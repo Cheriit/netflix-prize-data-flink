@@ -31,7 +31,7 @@ object KafkaRecordProducer extends App {
     try {
       Files.lines(Paths.get(path)).
         skip(1).
-        forEach(line => {
+        forEach((line: String) => {
           producer.send(new ProducerRecord[String, String](topicName, line.split(',')(0), line))
         })
       TimeUnit.SECONDS.sleep(sleepTime.toInt)

@@ -14,12 +14,12 @@ export KAFKA_BOOTSTRAP_SERVERS="${CLUSTER_NAME}-w-0:9092"
 export KAFKA_GROUP_ID="netflix-ratings-group"
 
 # JDBC parameters
-export JDBC_URL="jdbc:mysql://localhost:3307/netflix-ratings"
+export JDBC_URL="jdbc:mysql://localhost:3306/netflix-ratings"
 export JDBC_USERNAME="streamuser"
 export JDBC_PASSWORD="stream"
 
 # Flink parameters
-export FLINK_DIRECTORY="$HOME/netflix-prize-data-flink/flink-1.14.4-bin-scala_2.11"
+export FLINK_DIRECTORY="$HOME/netflix-prize-data-flink/flink-1.14.4"
 
 # Processing Engine parameters
 export ANOMALY_PERIOD_LENGTH="30"

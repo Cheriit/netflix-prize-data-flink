@@ -12,5 +12,4 @@ tar -xzf "$HOME/flink-1.14.4-bin-scala_2.11.tgz" || exit
 sbt clean assembly || exit
 kafka-topics.sh --zookeeper localhost:2181 --create --replication-factor 1 --partitions 1 --topic "$KAFKA_ANOMALY_TOPIC_NAME" || exit
 kafka-topics.sh --zookeeper localhost:2181 --create --replication-factor 1 --partitions 1 --topic "$KAFKA_DATA_TOPIC_NAME" || exit
-docker run -p 3307:3306 -e MYSQL_ROOT_PASSWORD="password" -e MYSQL_DATABASE="$KAFKA_DATA_TOPIC_NAME" -e MYSQL_ADMIN="$JDBC_USERNAME" -e MYSQL_PASSWORD="$JDBC_PASSWORD" -v "$(pwd)"/setup.sql:/docker-entrypoint-initdb.d/setup.sql:ro -d mysql:latest || exit
-
+mysql -u root -p root-password "$KAFKA_DATA_TOPIC_NAME" < setup.sql

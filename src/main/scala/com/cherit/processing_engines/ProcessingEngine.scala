@@ -10,6 +10,7 @@ import org.apache.flink.api.common.eventtime.WatermarkStrategy
 import org.apache.flink.api.common.restartstrategy.RestartStrategies
 import org.apache.flink.api.java.io.TextInputFormat
 import org.apache.flink.api.scala.createTypeInformation
+import org.apache.flink.connector.jdbc.JdbcStatementBuilder
 import org.apache.flink.core.fs.Path
 import org.apache.flink.streaming.api.scala.{DataStream, StreamExecutionEnvironment}
 import org.apache.flink.streaming.api.windowing.assigners.{SlidingEventTimeWindows, TumblingEventTimeWindows}
@@ -17,7 +18,7 @@ import org.apache.flink.streaming.api.windowing.time.Time
 import org.apache.flink.streaming.api.windowing.triggers.{ContinuousEventTimeTrigger, EventTimeTrigger}
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow
 
-import java.sql.Date
+import java.sql.{Date, PreparedStatement}
 
 object ProcessingEngine {
   def main(args: Array[String]): Unit = {
@@ -68,19 +69,22 @@ object ProcessingEngine {
 
     val mysqlSink = JdbcSinkHelper.get[MovieRatingResultWithTitle](
       "INSERT INTO movie_ratings (window_start, movie_id, title, rating_count, rating_sum, unique_rating_count) VALUES (?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE rating_count=?, rating_sum=?, unique_rating_count=?",
-      (statement, movieRating: MovieRatingResultWithTitle) => {
-        statement.setDate(1, new Date(movieRating.windowStart))
-        statement.setString(2, movieRating.movieId)
-        statement.setString(3, movieRating.title)
-        statement.setLong(4, movieRating.ratingCount)
-        statement.setLong(5, movieRating.ratingSum)
-        statement.setLong(6, movieRating.uniqueRatingCount)
-        statement.setLong(7, movieRating.ratingCount)
-        statement.setLong(8, movieRating.ratingSum)
-        statement.setLong(9, movieRating.uniqueRatingCount)
+      new JdbcStatementBuilder[MovieRatingResultWithTitle] {
+        override def accept(statement: PreparedStatement, movieRating: MovieRatingResultWithTitle): Unit = {
+          statement.setLong(1, movieRating.windowStart)
+          statement.setString(2, movieRating.movieId)
+          statement.setString(3, movieRating.title)
+          statement.setInt(4, movieRating.ratingCount.toInt)
+          statement.setInt(5, movieRating.ratingSum.toInt)
+          statement.setInt(6, movieRating.uniqueRatingCount.toInt)
+          statement.setInt(7, movieRating.ratingCount.toInt)
+          statement.setInt(8, movieRating.ratingSum.toInt)
+          statement.setInt(9, movieRating.uniqueRatingCount.toInt)
+        }
       },
-      args(4), "com.mysql.jdbc.Driver", args(5), args(6)
+      args(4), args(5), args(6)
     )
+
     aggregatedRatingWithTitleDS.addSink(mysqlSink)
 
     val movieAnomaliesRatingDS: DataStream[MovieRatingAnomaly] = movieRatingDS
