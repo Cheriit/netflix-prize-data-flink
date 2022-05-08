@@ -14,9 +14,9 @@ export KAFKA_BOOTSTRAP_SERVERS="${CLUSTER_NAME}-w-0:9092"
 export KAFKA_GROUP_ID="netflix-ratings-group"
 
 # JDBC parameters
-export JDBC_URL="jdbc:mysql://localhost:3307/$KAFKA_DATA_TOPIC_NAME"
-export JDBC_USERNAME="hive"
-export JDBC_PASSWORD="hive-password"
+export JDBC_URL="jdbc:mysql://localhost:3307/netflix-ratings"
+export JDBC_USERNAME="streamuser"
+export JDBC_PASSWORD="stream"
 
 # Flink parameters
 export FLINK_DIRECTORY="$HOME/flink-1.14.4-bin-scala_2.11"

@@ -4,7 +4,7 @@ import java.sql.{Connection, DriverManager}
 import java.util.NoSuchElementException
 
 object JdbcRecordConsumer extends App {
-  if (args.length != 4)
+  if (args.length != 3)
     throw new NoSuchElementException
 
   var connection: Connection = _
@@ -13,7 +13,7 @@ object JdbcRecordConsumer extends App {
     connection = DriverManager.getConnection(args(0), args(1), args(2))
     val statement = connection.createStatement
     while(true) {
-      val result = statement.executeQuery("SELECT * FROM ratings ORDER BY window_start DESC LIMIT 50")
+      val result = statement.executeQuery("SELECT * FROM movie_ratings ORDER BY window_start DESC LIMIT 50")
       print("\u001b[2J")
       while(result.next) {
         val windowStart = result.getDate("window_start").toLocalDate

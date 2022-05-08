@@ -1,3 +1,5 @@
+CREATE USER 'streamuser'@'%' IDENTIFIED BY 'stream';
+GRANT ALL ON netflix-ratings.* TO 'streamuser'@'%';
 CREATE TABLE IF NOT EXISTS movie_ratings (
     window_start DATE NOT NULL,
     movie_id varchar(128) NOT NULL,
