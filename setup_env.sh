@@ -12,4 +12,4 @@ tar -xzf "$HOME/flink-1.14.4-bin-scala_2.11.tgz" || exit
 sbt clean assembly || exit
 kafka-topics.sh --zookeeper localhost:2181 --create --replication-factor 1 --partitions 1 --topic "$KAFKA_ANOMALY_TOPIC_NAME" || exit
 kafka-topics.sh --zookeeper localhost:2181 --create --replication-factor 1 --partitions 1 --topic "$KAFKA_DATA_TOPIC_NAME" || exit
-mysql -u root -p root-password "$KAFKA_DATA_TOPIC_NAME" < setup.sql
+mysql -u root -p < setup.sql

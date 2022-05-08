@@ -1,6 +1,8 @@
 ThisBuild / version := "0.1.0-SNAPSHOT"
 ThisBuild / organization := "com.cherit"
 ThisBuild / scalaVersion := "2.11.12"
+ThisBuild / scalacOptions += "-target:jvm-1.8"
+
 val flinkVersion = "1.14.4"
 
 

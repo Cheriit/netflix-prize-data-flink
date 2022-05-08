@@ -14,7 +14,7 @@ export KAFKA_BOOTSTRAP_SERVERS="${CLUSTER_NAME}-w-0:9092"
 export KAFKA_GROUP_ID="netflix-ratings-group"
 
 # JDBC parameters
-export JDBC_URL="jdbc:mysql://localhost:3306/netflix-ratings"
+export JDBC_URL="jdbc:mysql://localhost:3306/netflix_ratings"
 export JDBC_USERNAME="streamuser"
 export JDBC_PASSWORD="stream"
 

@@ -6,6 +6,7 @@ import java.io.File
 import java.nio.file.{Files, Paths}
 import java.util.{NoSuchElementException, Properties}
 import java.util.concurrent.TimeUnit
+import java.util.function.Consumer
 
 object KafkaRecordProducer extends App {
   if (args.length != 4)
@@ -31,8 +32,9 @@ object KafkaRecordProducer extends App {
     try {
       Files.lines(Paths.get(path)).
         skip(1).
-        forEach((line: String) => {
-          producer.send(new ProducerRecord[String, String](topicName, line.split(',')(0), line))
+        forEach(
+          new Consumer[String] {
+            override def accept(t: String): Unit = producer.send(new ProducerRecord[String, String](topicName, t.split(',')(0), t))
         })
       TimeUnit.SECONDS.sleep(sleepTime.toInt)
     } catch {

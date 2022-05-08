@@ -1,6 +1,8 @@
+DROP USER IF EXISTS 'streamuser'@'%';
 CREATE USER 'streamuser'@'%' IDENTIFIED BY 'stream';
-CREATE DATABASE IF NOT EXISTS netflix-ratings;
-GRANT ALL ON netflix-ratings.* TO 'streamuser'@'%';
+CREATE DATABASE IF NOT EXISTS netflix_ratings CHARACTER SET utf8;
+GRANT ALL ON netflix_ratings.* TO 'streamuser'@'%';
+USE netflix_ratings;
 CREATE TABLE IF NOT EXISTS movie_ratings (
     window_start BIGINT NOT NULL,
     movie_id varchar(32) NOT NULL,

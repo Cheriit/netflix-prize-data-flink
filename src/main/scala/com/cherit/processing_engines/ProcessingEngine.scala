@@ -3,22 +3,21 @@ package com.cherit.processing_engines
 import com.cherit.aggregators.{MovieRatingAggregator, MovieRatingAnomalyAggregator}
 import com.cherit.models._
 import com.cherit.process_functions.{MovieRatingAnomalyProcessFunction, MovieRatingProcessFunction}
+import com.cherit.rich_functions.{MovieAnomalyRichFunction, MovieResultRichFunction}
 import com.cherit.sinks.{JdbcSinkHelper, KafkaSinkHelper}
 import com.cherit.sources.KafkaSourceHelper
 import com.cherit.watermarks.MovieRatingWatermarkStrategy
 import org.apache.flink.api.common.eventtime.WatermarkStrategy
 import org.apache.flink.api.common.restartstrategy.RestartStrategies
-import org.apache.flink.api.java.io.TextInputFormat
 import org.apache.flink.api.scala.createTypeInformation
 import org.apache.flink.connector.jdbc.JdbcStatementBuilder
-import org.apache.flink.core.fs.Path
 import org.apache.flink.streaming.api.scala.{DataStream, StreamExecutionEnvironment}
 import org.apache.flink.streaming.api.windowing.assigners.{SlidingEventTimeWindows, TumblingEventTimeWindows}
 import org.apache.flink.streaming.api.windowing.time.Time
-import org.apache.flink.streaming.api.windowing.triggers.{ContinuousEventTimeTrigger, EventTimeTrigger}
+import org.apache.flink.streaming.api.windowing.triggers.ContinuousEventTimeTrigger
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow
 
-import java.sql.{Date, PreparedStatement}
+import java.sql.PreparedStatement
 
 object ProcessingEngine {
   def main(args: Array[String]): Unit = {
@@ -28,19 +27,7 @@ object ProcessingEngine {
     val senv = StreamExecutionEnvironment.getExecutionEnvironment
     val numberOfRetries = 3
     senv.getConfig.setRestartStrategy(RestartStrategies.fixedDelayRestart(numberOfRetries, 0))
-
-    val filePath = new Path(args(0))
-    val fileFormat = new TextInputFormat(filePath)
-    val localFsURI = "file:///tmp/flink-input"
-    //  fileFormat.setFilesFilter(FilePathFilter.createDefaultFilter())
-
-    val movieFileStream: DataStream[String] = senv.readFile(fileFormat, localFsURI)
-
-    val movieDS: DataStream[Movie] = movieFileStream
-      .filter(!_.startsWith("ID"))
-      .map(_.split(","))
-      .filter(_.length == 3)
-      .map(array => Movie(array(0), array(1).toInt, array(2)))
+    senv.registerCachedFile(args(0), "moviesFile")
 
     val source = KafkaSourceHelper.get(args(1), args(2), args(3))
 
@@ -60,12 +47,7 @@ object ProcessingEngine {
       .aggregate(new MovieRatingAggregator, new MovieRatingProcessFunction)
 
     val aggregatedRatingWithTitleDS: DataStream[MovieRatingResultWithTitle] = aggregatedRatingDS
-      .join(movieDS)
-      .where(_.movieId)
-      .equalTo(_.id)
-      .window(TumblingEventTimeWindows.of(Time.days(30))) {
-        (rating, movie) => MovieRatingResultWithTitle(rating.windowStart, movie.id, movie.title, rating.ratingCount, rating.ratingSum, rating.uniqueRatingCount)
-      }
+      .map(new MovieResultRichFunction)
 
     val mysqlSink = JdbcSinkHelper.get[MovieRatingResultWithTitle](
       "INSERT INTO movie_ratings (window_start, movie_id, title, rating_count, rating_sum, unique_rating_count) VALUES (?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE rating_count=?, rating_sum=?, unique_rating_count=?",
@@ -95,12 +77,7 @@ object ProcessingEngine {
       .filter(_.ratingMean >= args(9).toLong)
 
     val movieAnomaliesRatingWithTitleDS: DataStream[MovieRatingAnomalyWithTitle] = movieAnomaliesRatingDS
-      .join(movieDS)
-      .where(_.movieId)
-      .equalTo(_.id)
-      .window(SlidingEventTimeWindows.of(Time.days(args(3).toInt), Time.days(1))) {
-        (anomaly, movie) => MovieRatingAnomalyWithTitle(anomaly.windowStart, anomaly.windowStop, movie.title, anomaly.ratingCount, anomaly.ratingMean)
-      }
+      .map(new MovieAnomalyRichFunction)
 
     val kafkaSink = KafkaSinkHelper.get(args(1), args(10))
     movieAnomaliesRatingWithTitleDS.map(_.toString).sinkTo(kafkaSink)
