@@ -14,7 +14,7 @@ export KAFKA_BOOTSTRAP_SERVERS="${CLUSTER_NAME}-w-0:9092"
 export KAFKA_GROUP_ID="netflix-ratings-group"
 
 # JDBC parameters
-export JDBC_URL="jdbc:mysql://$CLUSTER_NAME-m/metastore"
+export JDBC_URL="jdbc:mysql://localhost:3306/$KAFKA_DATA_TOPIC_NAME"
 export JDBC_DRIVER_NAME="com.mysql.cj.jdbc.Driver"
 export JDBC_USERNAME="hive"
 export JDBC_PASSWORD="hive-password"
