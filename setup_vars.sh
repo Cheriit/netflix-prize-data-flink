@@ -22,7 +22,7 @@ export JDBC_PASSWORD="stream"
 export FLINK_DIRECTORY="$HOME/netflix-prize-data-flink/flink-1.14.4"
 
 # Processing Engine parameters
-export ANOMALY_PERIOD_LENGTH="30"
-export ANOMALY_RATING_COUNT="100"
-export ANOMALY_RATING_MEAN="4"
+export ANOMALY_PERIOD_LENGTH=30
+export ANOMALY_RATING_COUNT=70
+export ANOMALY_RATING_MEAN=4
 export PROCESSING_TYPE="H" # H for historical, S for Stream

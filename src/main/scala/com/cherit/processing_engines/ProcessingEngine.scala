@@ -14,7 +14,7 @@ import org.apache.flink.connector.jdbc.JdbcStatementBuilder
 import org.apache.flink.streaming.api.scala.{DataStream, StreamExecutionEnvironment}
 import org.apache.flink.streaming.api.windowing.assigners.{SlidingEventTimeWindows, TumblingEventTimeWindows}
 import org.apache.flink.streaming.api.windowing.time.Time
-import org.apache.flink.streaming.api.windowing.triggers.ContinuousEventTimeTrigger
+import org.apache.flink.streaming.api.windowing.triggers.ContinuousProcessingTimeTrigger
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer
 
@@ -50,7 +50,7 @@ object ProcessingEngine {
     val aggregatedRatingDS: DataStream[MovieRatingResult] = movieRatingDS
       .keyBy(_.movieId)
       .window(TumblingEventTimeWindows.of(Time.days(30)))
-      .trigger(ContinuousEventTimeTrigger.of[TimeWindow](if (args(11) == "H") Time.seconds(10) else Time.days(30)))
+      .trigger(ContinuousProcessingTimeTrigger.of[TimeWindow](if (args(11) == "H") Time.seconds(10) else Time.days(30)))
       .aggregate(new MovieRatingAggregator, new MovieRatingProcessFunction)
 
     val aggregatedRatingWithTitleDS: DataStream[MovieRatingResultWithTitle] = aggregatedRatingDS
