@@ -26,7 +26,7 @@ object JdbcRecordConsumer extends App {
         val dateFrom = s"${windowStart.getYear}-${windowStart.getMonth}-${windowStart.getDayOfMonth}"
         val windowEnd = windowStart.plusDays(30)
         val dateTo = s"${windowEnd.getYear}-${windowEnd.getMonth}-${windowEnd.getDayOfMonth}"
-        println(s"$dateFrom - $dateTo \t\t $title($movieId) \t $ratingCount \t $ratingSum \t $uniqueRatingCount")
+        println(s"$dateFrom - $dateTo \t $title($movieId) \t $ratingCount \t $ratingSum \t $uniqueRatingCount")
       }
       Thread.sleep(10000)
     }
