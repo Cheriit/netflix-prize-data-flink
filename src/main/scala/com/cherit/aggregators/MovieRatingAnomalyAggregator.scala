@@ -4,7 +4,7 @@ import com.cherit.models.{MovieRating, MovieRatingAnomalyAccumulator, MovieRatin
 import org.apache.flink.api.common.functions.AggregateFunction
 
 class MovieRatingAnomalyAggregator extends AggregateFunction[MovieRating, MovieRatingAnomalyAccumulator, MovieRatingAnomalyAggregated] {
-  override def createAccumulator(): MovieRatingAnomalyAccumulator = MovieRatingAnomalyAccumulator("99999999999999999999", 0, 0)
+  override def createAccumulator(): MovieRatingAnomalyAccumulator = MovieRatingAnomalyAccumulator(0, 0, 0)
 
   override def add(in: MovieRating, acc: MovieRatingAnomalyAccumulator): MovieRatingAnomalyAccumulator = MovieRatingAnomalyAccumulator(in.movieId, acc.ratingCount + 1, acc.ratingSum + in.rate)
 

@@ -7,8 +7,8 @@ import com.cherit.rich_functions.{MovieAnomalyRichFunction, MovieResultRichFunct
 import com.cherit.sinks.{JdbcSinkHelper, KafkaSinkHelper}
 import com.cherit.sources.KafkaSourceHelper
 import com.cherit.watermarks.MovieRatingWatermarkStrategy
-import org.apache.flink.api.common.eventtime.WatermarkStrategy
 import org.apache.flink.api.common.restartstrategy.RestartStrategies
+import org.apache.flink.api.common.serialization.SimpleStringSchema
 import org.apache.flink.api.scala.createTypeInformation
 import org.apache.flink.connector.jdbc.JdbcStatementBuilder
 import org.apache.flink.streaming.api.scala.{DataStream, StreamExecutionEnvironment}
@@ -16,8 +16,10 @@ import org.apache.flink.streaming.api.windowing.assigners.{SlidingEventTimeWindo
 import org.apache.flink.streaming.api.windowing.time.Time
 import org.apache.flink.streaming.api.windowing.triggers.ContinuousEventTimeTrigger
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow
+import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer
 
 import java.sql.PreparedStatement
+import java.util.Properties
 
 object ProcessingEngine {
   def main(args: Array[String]): Unit = {
@@ -31,30 +33,34 @@ object ProcessingEngine {
 
     val source = KafkaSourceHelper.get(args(1), args(2), args(3))
 
-    val inputStream: DataStream[String] = senv.fromSource(source, WatermarkStrategy.noWatermarks(), "Kafka Source")
-    val format = new java.text.SimpleDateFormat("yyyy-MM-dd")
+//    val inputStream: DataStream[String] = senv.fromSource(source, WatermarkStrategy.noWatermarks(), "Kafka Source")
 
+    val properties = new Properties()
+    properties.setProperty("bootstrap.servers", args(1))
+    properties.setProperty("group.id", args(3))
+    val inputStream = senv.addSource(new FlinkKafkaConsumer[String](args(2), new SimpleStringSchema(), properties))
+
+    val format = new java.text.SimpleDateFormat("yyyy-MM-dd")
     val movieRatingDS: DataStream[MovieRating] = inputStream
       .map(_.split(","))
       .filter(_.length == 4)
-      .map(array => MovieRating(format.parse(array(0)), array(1), array(2), array(3).toInt))
+      .map(array => MovieRating(format.parse(array(0)), array(1).toInt, array(2), array(3).toInt))
       .assignTimestampsAndWatermarks(new MovieRatingWatermarkStrategy[MovieRating])
 
     val aggregatedRatingDS: DataStream[MovieRatingResult] = movieRatingDS
       .keyBy(_.movieId)
       .window(TumblingEventTimeWindows.of(Time.days(30)))
-      .trigger(ContinuousEventTimeTrigger.of[TimeWindow](if (args(11) == "H") Time.days(30) else Time.seconds(10)))
+      .trigger(ContinuousEventTimeTrigger.of[TimeWindow](if (args(11) == "H") Time.seconds(10) else Time.days(30)))
       .aggregate(new MovieRatingAggregator, new MovieRatingProcessFunction)
 
     val aggregatedRatingWithTitleDS: DataStream[MovieRatingResultWithTitle] = aggregatedRatingDS
       .map(new MovieResultRichFunction)
-
     val mysqlSink = JdbcSinkHelper.get[MovieRatingResultWithTitle](
       "INSERT INTO movie_ratings (window_start, movie_id, title, rating_count, rating_sum, unique_rating_count) VALUES (?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE rating_count=?, rating_sum=?, unique_rating_count=?",
       new JdbcStatementBuilder[MovieRatingResultWithTitle] {
         override def accept(statement: PreparedStatement, movieRating: MovieRatingResultWithTitle): Unit = {
           statement.setLong(1, movieRating.windowStart)
-          statement.setString(2, movieRating.movieId)
+          statement.setInt(2, movieRating.movieId)
           statement.setString(3, movieRating.title)
           statement.setInt(4, movieRating.ratingCount.toInt)
           statement.setInt(5, movieRating.ratingSum.toInt)

@@ -28,5 +28,5 @@ class MovieAnomalyRichFunction extends RichMapFunction[MovieRatingAnomaly, Movie
   }
 
   override def map(value: MovieRatingAnomaly): MovieRatingAnomalyWithTitle =
-    MovieRatingAnomalyWithTitle(value.windowStart, value.movieId, moviesMap.get(value.movieId.toInt).orNull, value.ratingCount, value.ratingMean)
+    MovieRatingAnomalyWithTitle(value.windowStart, value.windowStop, value.movieId, moviesMap.get(value.movieId).orNull, value.ratingCount, value.ratingMean)
 }

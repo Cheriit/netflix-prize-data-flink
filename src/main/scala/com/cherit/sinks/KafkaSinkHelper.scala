@@ -13,6 +13,6 @@ object KafkaSinkHelper {
     .setTopic(topic)
     .setValueSerializationSchema(new SimpleStringSchema())
     .build())
-    .setDeliverGuarantee(DeliveryGuarantee.EXACTLY_ONCE)
+    .setDeliverGuarantee(DeliveryGuarantee.AT_LEAST_ONCE)
     .build()
 }

@@ -1,3 +1,3 @@
 package com.cherit.models
 
-case class MovieRatingAnomalyAggregated(movieId: String, ratingCount: Long, ratingMean: Float)
+case class MovieRatingAnomalyAggregated(movieId: Int, ratingCount: Long, ratingMean: Float)
