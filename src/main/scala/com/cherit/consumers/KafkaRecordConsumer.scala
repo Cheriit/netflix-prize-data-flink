@@ -20,7 +20,7 @@ object KafkaRecordConsumer extends App {
   val consumer = new KafkaConsumer[String, String](properties)
   consumer.subscribe(singletonList(args(2)))
   while (true) {
-    val results = consumer.poll(Duration.ofSeconds(60)).asScala
+    val results = consumer.poll(Duration.ofSeconds(6000)).asScala
     results.foreach( data => println(data.value())
     )
   }
