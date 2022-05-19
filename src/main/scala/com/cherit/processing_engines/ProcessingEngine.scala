@@ -5,7 +5,6 @@ import com.cherit.models._
 import com.cherit.process_functions.{MovieRatingAnomalyProcessFunction, MovieRatingProcessFunction}
 import com.cherit.rich_functions.{MovieAnomalyRichFunction, MovieResultRichFunction}
 import com.cherit.sinks.{JdbcSinkHelper, KafkaSinkHelper}
-import com.cherit.sources.KafkaSourceHelper
 import com.cherit.watermarks.MovieRatingWatermarkStrategy
 import org.apache.flink.api.common.restartstrategy.RestartStrategies
 import org.apache.flink.api.common.serialization.SimpleStringSchema
@@ -14,8 +13,6 @@ import org.apache.flink.connector.jdbc.JdbcStatementBuilder
 import org.apache.flink.streaming.api.scala.{DataStream, StreamExecutionEnvironment}
 import org.apache.flink.streaming.api.windowing.assigners.{SlidingEventTimeWindows, TumblingEventTimeWindows}
 import org.apache.flink.streaming.api.windowing.time.Time
-import org.apache.flink.streaming.api.windowing.triggers.ContinuousProcessingTimeTrigger
-import org.apache.flink.streaming.api.windowing.windows.TimeWindow
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer
 
 import java.sql.PreparedStatement
@@ -23,7 +20,7 @@ import java.util.Properties
 
 object ProcessingEngine {
   def main(args: Array[String]): Unit = {
-    if (args.length != 12)
+    if (args.length != 11)
       throw new NoSuchElementException
 
     val senv = StreamExecutionEnvironment.getExecutionEnvironment
@@ -31,8 +28,7 @@ object ProcessingEngine {
     senv.getConfig.setRestartStrategy(RestartStrategies.fixedDelayRestart(numberOfRetries, 0))
     senv.registerCachedFile(args(0), "moviesFile")
 
-    val source = KafkaSourceHelper.get(args(1), args(2), args(3))
-
+//    val source = KafkaSourceHelper.get(args(1), args(2), args(3))
 //    val inputStream: DataStream[String] = senv.fromSource(source, WatermarkStrategy.noWatermarks(), "Kafka Source")
 
     val properties = new Properties()
@@ -50,7 +46,6 @@ object ProcessingEngine {
     val aggregatedRatingDS: DataStream[MovieRatingResult] = movieRatingDS
       .keyBy(_.movieId)
       .window(TumblingEventTimeWindows.of(Time.days(30)))
-      .trigger(ContinuousProcessingTimeTrigger.of[TimeWindow](if (args(11) == "H") Time.seconds(10) else Time.days(30)))
       .aggregate(new MovieRatingAggregator, new MovieRatingProcessFunction)
 
     val aggregatedRatingWithTitleDS: DataStream[MovieRatingResultWithTitle] = aggregatedRatingDS
